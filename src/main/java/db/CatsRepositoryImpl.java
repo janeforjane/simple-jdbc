@@ -39,16 +39,16 @@ public class CatsRepositoryImpl implements CatsRepo {
 
         //try используется для того чтобы не выполнять close всего
 
-        try(
+        try (
                 Connection newConnection = hikariCPDataSource.getConnection();
                 Statement statement = newConnection.createStatement();
                 ResultSet resultSet = statement.executeQuery("SELECT * FROM cats");
-                ) {
+        ) {
             while (resultSet.next()) {
                 //каждая итерация цикла - строка таблицы
                 Cat cat = new Cat();
 
-                cat.setId(resultSet.getInt("idCat"));
+                cat.setId(resultSet.getInt("id"));
                 cat.setName(resultSet.getString("name"));
 
                 cats.add(cat);
@@ -109,7 +109,7 @@ public class CatsRepositoryImpl implements CatsRepo {
         Connection connection = getNewConnection();
 
         PreparedStatement preparedStatement = connection.prepareStatement(
-                "SELECT * FROM cats where \"idCat\"= ?");
+                "SELECT * FROM cats where \"id\"= ?");
 
         preparedStatement.setInt(1, id);
 
@@ -118,7 +118,7 @@ public class CatsRepositoryImpl implements CatsRepo {
 
         Cat cat = new Cat();
 
-        while (resultSet.next()){
+        while (resultSet.next()) {
 
             cat.setId(resultSet.getInt(1));
             cat.setName(resultSet.getString(2));
@@ -146,7 +146,7 @@ public class CatsRepositoryImpl implements CatsRepo {
 
         CatOwner catOwner = new CatOwner();
 
-        while (resultSet.next()){
+        while (resultSet.next()) {
 
             catOwner.setId(resultSet.getInt(1));
             catOwner.setName(resultSet.getString(2));
@@ -178,7 +178,7 @@ public class CatsRepositoryImpl implements CatsRepo {
                         "VALUES (?,?,?,?);");
 
         //для того чтобы выполнить только один запрос используем batch
-        for (Cat cat: cats) {
+        for (Cat cat : cats) {
 
             preparedStatement.setString(1, cat.getName());
             preparedStatement.setString(2, "fffff");
@@ -212,7 +212,80 @@ public class CatsRepositoryImpl implements CatsRepo {
     }
 
     @Override
-    public void createNewCatOwner(Cat cat) {
+    public void createNewCatOwner(Cat cat) {}
+
+
+    /**
+     * <p>Example to show how transaction works.
+     * Here transaction considered as two inserts.
+     * </p>
+     * <li> Start a transaction by getting a Connection and deactivating auto-commit.
+     * This gives you control over the database transaction. Otherwise, you would automatically execute each
+     * SQL statement within a separate transaction.
+     * <li>Commit a transaction by calling the commit() method on the Connection interface.
+     * This tells your database to perform all required consistency checks and persist the changes permanently.
+     * <li>Rollback all operations performed during the transaction by calling the rollback() method on
+     * the Connection interface. You usually perform this operation if an SQL statement failed or
+     * if you detected an error in your business logic.
+     * <li>{@link Cat}
+     */
+    public void createTwoNewCatOwners(Cat cat) throws SQLException {
+        Connection connection = null;
+
+        try{
+
+            connection = getNewConnection();
+            connection.setAutoCommit(false);
+
+            //first
+            System.out.println("First insert in progress");
+            PreparedStatement preparedStatement = connection.prepareStatement(
+                    "INSERT INTO public.cats_owners (id, name, cat_id) " +
+                            "VALUES (?,?,?);");
+
+            //для того чтобы выполнить только один запрос используем batch
+            preparedStatement.setInt(1, 7);
+            preparedStatement.setString(2, "Bold man");
+            preparedStatement.setInt(3, cat.getId());
+
+            preparedStatement.addBatch();
+            preparedStatement.executeBatch();
+            preparedStatement.close();
+
+            System.out.println("First insert in finished");
+
+            Thread.sleep(20000);
+
+            //second insert
+            System.out.println("Second insert in progress");
+            PreparedStatement preparedStatement2 = connection.prepareStatement(
+                    "INSERT INTO public.cats_owners (id, name, cat_id) " +
+                            "VALUES (?,?,?);");
+
+            //для того чтобы выполнить только один запрос используем batch
+            preparedStatement2.setInt(1, 8);
+            preparedStatement2.setString(2, "Local mad old man");
+            preparedStatement2.setInt(3, cat.getId());
+
+            preparedStatement2.addBatch();
+            preparedStatement2.executeBatch();
+            preparedStatement2.close();
+
+            System.out.println("Second insert in finished");
+
+            connection.commit();
+            connection.close();
+
+            System.out.println("End of transaction");
+
+        } catch (SQLException e) {
+            System.out.println("SQLException occured");
+            System.out.println("Rollback ...");
+            connection.rollback();
+            throw new RuntimeException(e);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
 
     }
 
@@ -223,7 +296,7 @@ public class CatsRepositoryImpl implements CatsRepo {
         Connection connection = getNewConnection();
 
         PreparedStatement preparedStatement = connection.prepareStatement(
-                "UPDATE public.cats SET name = 'Sofa' WHERE \"idCat\" = ?");
+                "UPDATE public.cats SET name = 'Sofa' WHERE \"id\" = ?");
 
         preparedStatement.setInt(1, 8);
         preparedStatement.executeUpdate();
@@ -245,7 +318,7 @@ public class CatsRepositoryImpl implements CatsRepo {
         Connection connection = getNewConnection();
 
         PreparedStatement preparedStatement = connection.prepareStatement(
-                "DELETE FROM public.cats WHERE \"idCat\" = ?");
+                "DELETE FROM public.cats WHERE \"id\" = ?");
 
         preparedStatement.setInt(1, 9);
         preparedStatement.executeUpdate();
@@ -276,7 +349,7 @@ public class CatsRepositoryImpl implements CatsRepo {
             //каждая итерация цикла - строка таблицы
             Cat cat = new Cat();
 
-            cat.setId(resultSet.getInt("idCat"));
+            cat.setId(resultSet.getInt("id"));
             cat.setName(resultSet.getString("name"));
 
             cats.add(cat);
@@ -291,14 +364,16 @@ public class CatsRepositoryImpl implements CatsRepo {
     }
 
     public Connection getNewConnection() throws SQLException {
-        String url ="jdbc:postgresql://localhost:5432/postgres";
+        String url = "jdbc:postgresql://localhost:5432/postgres";
         String user = "user";
         String pwd = "passw0rd";
 
-        Connection connection = DriverManager.getConnection(url,user,pwd);
+        Connection connection = DriverManager.getConnection(url, user, pwd);
 
         return connection;
 
-    };
+    }
+
+    ;
 
 }

@@ -14,7 +14,8 @@ public interface CatsRepo {
     CatOwner getCatOwner(Cat cat) throws SQLException;
 
     void createNewCat(List<Cat> cat) throws SQLException;
-    void createNewCatOwner(Cat cat);
+    void createNewCatOwner(Cat cat) throws SQLException;
+    void createTwoNewCatOwners(Cat cat) throws SQLException;
     void createNewCatsOwnerWithStoredProcedure(String name) throws SQLException;
 
     void updateCat(Cat cat) throws SQLException;

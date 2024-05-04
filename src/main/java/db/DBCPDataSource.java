@@ -12,7 +12,7 @@ public class DBCPDataSource {
     static  {
         ds.setUrl("jdbc:postgresql://localhost:5432/postgres");
         ds.setUsername("user");
-        ds.setPassword(" ");
+        ds.setPassword("passw0rd");
         ds.setMinIdle(5);
         ds.setMaxIdle(10);
         ds.setMaxOpenPreparedStatements(100);

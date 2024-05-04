@@ -17,6 +17,10 @@ public class Main {
             System.out.println(cat);
         }
 
+        Cat cat = catsRepo.getCat(2);
+        System.out.println("Cat is: " + cat);
+        catsRepo.createTwoNewCatOwners(cat);
+
 
     }
 }
