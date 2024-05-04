@@ -231,9 +231,6 @@ public class CatsRepositoryImpl implements CatsRepo {
      * the Connection interface. You usually perform this operation if an SQL statement failed or
      * if you detected an error in your business logic:
      * <p><b>connection.rollback();</b></p>
-     * <li>{@link Cat}
-     * <li><i>cursive</i></li>
-     * <li><b>bold</b></li>
      */
     public void createTwoNewCatOwners(Cat cat) throws SQLException {
         Connection connection = null;
@@ -257,7 +254,7 @@ public class CatsRepositoryImpl implements CatsRepo {
             preparedStatement.executeBatch();
             preparedStatement.close();
 
-            System.out.println("First insert in finished");
+            System.out.println("First insert is finished");
 
             Thread.sleep(20000);
 
@@ -276,7 +273,7 @@ public class CatsRepositoryImpl implements CatsRepo {
             preparedStatement2.executeBatch();
             preparedStatement2.close();
 
-            System.out.println("Second insert in finished");
+            System.out.println("Second insert is finished");
 
             connection.commit();
             connection.close();
