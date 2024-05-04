@@ -219,21 +219,26 @@ public class CatsRepositoryImpl implements CatsRepo {
      * <p>Example to show how transaction works.
      * Here transaction considered as two inserts.
      * </p>
-     * <li> Start a transaction by getting a Connection and deactivating auto-commit.
-     * This gives you control over the database transaction. Otherwise, you would automatically execute each
-     * SQL statement within a separate transaction.
-     * <li>Commit a transaction by calling the commit() method on the Connection interface.
+     * <li> Start a transaction by getting a Connection and deactivating auto-commit:
+     * <p><b>connection.setAutoCommit(false);</b></p>
+     * This gives you control over the database transaction.
+     * <p>Otherwise, you would automatically execute each
+     * SQL statement within a separate transaction.</p>
+     * <li>Commit a transaction by calling the commit() method on the Connection interface:
+     * <p><b>connection.commit();</b></p>
      * This tells your database to perform all required consistency checks and persist the changes permanently.
      * <li>Rollback all operations performed during the transaction by calling the rollback() method on
      * the Connection interface. You usually perform this operation if an SQL statement failed or
-     * if you detected an error in your business logic.
+     * if you detected an error in your business logic:
+     * <p><b>connection.rollback();</b></p>
      * <li>{@link Cat}
+     * <li><i>cursive</i></li>
+     * <li><b>bold</b></li>
      */
     public void createTwoNewCatOwners(Cat cat) throws SQLException {
         Connection connection = null;
 
         try{
-
             connection = getNewConnection();
             connection.setAutoCommit(false);
 
